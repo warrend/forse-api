@@ -1,7 +1,13 @@
-const hello = async (req, res, next) => {
-  res.status(200).json()
+const dal = require('./dal')
+
+const addGame = async (req, res, next) => {
+  // await validator(schema.gamesSchema, req.body)
+  if (req.body) dal.addGame(req.body)
+
+  res.status(202).end()
+  next()
 }
 
 module.exports = {
-  hello
+  addGame
 }

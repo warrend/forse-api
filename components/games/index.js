@@ -3,6 +3,6 @@ const asyncHandler = require('express-async-handler')
 const games = require('./controller')
 
 const router = express.Router()
-router.post('/hello', asyncHandler(games.hello))
+router.post('/', asyncHandler(games.addGame))
 
 module.exports = router
