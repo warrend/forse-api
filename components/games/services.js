@@ -28,20 +28,34 @@ const createNewGame = async (challengerId, contenderId) => {
     }
   
     let gamesRef = await db.collection('games').add(newGame)
-    // @TODO refactor this below
-    await addGameIdToUser(challengerId, gamesRef.id)
-    await addGameIdToUser(contenderId, gamesRef.id)
+    await addGameIdToUser([challengerId, contenderId], gamesRef.id)
+    await addGameIdToCurrentGame([challengerId, contenderId], gamesRef.id)
   } catch (error) {
     throw new ServerError(error)
   }
 }
 
-const addGameIdToUser = async (playerId, gameId) => {
+const addGameIdToCurrentGame = async (players, gameId) => {
   try {
-    let playerRef = db.collection('players').doc(playerId)
-    return await playerRef.update({
-      ['games']: admin.firestore.FieldValue.arrayUnion(gameId)
-    })
+    for (let i = 0; i < players.length; i++) {
+      let playerRef = db.collection('players').doc(players[i])
+      await playerRef.update({
+        ['currentGameId']: gameId
+      })
+    }
+  } catch (error) {
+    throw new ServerError(error)
+  }
+}
+
+const addGameIdToUser = async (players, gameId) => {
+  try {
+    for (let i = 0; i < players.length; i++) {
+      let playerRef = db.collection('players').doc(players[i])
+      await playerRef.update({
+        ['games']: admin.firestore.FieldValue.arrayUnion(gameId)
+      })
+    }
   } catch (error) {
     throw new ServerError(error)
   }
@@ -78,4 +92,5 @@ module.exports = {
   challengeResponse,
   addGameIdToUser,
   createNewGame,
+  addGameIdToCurrentGame,
 }
